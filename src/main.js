@@ -1,11 +1,9 @@
 import * as BABYLON from "babylonjs";
-import { createScene1 } from "./scenes/Scene1";
+import { createScene1 } from "./scenes/scene1.js";
 
-const canvas = document.createElement("canvas");
-canvas.id = "renderCanvas";
-document.body.appendChild(canvas);
-
+const canvas = document.getElementById("renderCanvas");
 const engine = new BABYLON.Engine(canvas, true);
+
 let scene = createScene1(engine, canvas);
 
 engine.runRenderLoop(() => {
@@ -13,5 +11,5 @@ engine.runRenderLoop(() => {
 });
 
 window.addEventListener("resize", () => {
-  engine.resize();
+  engine.resize(); // Redimensionne automatiquement le canvas si la fenêtre change
 });
