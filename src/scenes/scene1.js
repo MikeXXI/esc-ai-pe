@@ -20,10 +20,10 @@ export function createScene1(engine, canvas) {
   //   evt => inputMap[evt.sourceEvent.key.toLowerCase()] = true
   // ));
 
-  scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-    BABYLON.ActionManager.OnKeyUpTrigger,
-    evt => inputMap[evt.sourceEvent.key.toLowerCase()] = false
-  ));
+  // scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
+  //   BABYLON.ActionManager.OnKeyUpTrigger,
+  //   evt => inputMap[evt.sourceEvent.key.toLowerCase()] = false
+  // ));
 
   camera.speed = 0.5;
   camera.inertia = 0.7;
