@@ -4,6 +4,7 @@ import "babylonjs-loaders";
 import { addHand } from "../objects/addhand.js";
 import { addWall } from "../objects/addwall.js";
 import { addGround } from "../objects/addground.js";
+import { createScene2 } from "./scene2.js";
 
 export function createScene1(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
@@ -51,6 +52,20 @@ export function createScene1(engine, canvas) {
   const cubeMat = new BABYLON.StandardMaterial("cubeMat", scene);
   cubeMat.diffuseColor = new BABYLON.Color3(0, 1, 0);
   cube.material = cubeMat;
+
+  // Activer les collisions du cube
+  //cube.checkCollisions = true;
+  cube.actionManager = new BABYLON.ActionManager(scene);
+  cube.actionManager.registerAction(
+    new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+      const newScene = createScene2(engine, canvas);
+      engine.runRenderLoop(() => {
+        if (newScene.activeCamera) {
+          newScene.render();
+        }
+      });
+    })
+  );
 
  
 
