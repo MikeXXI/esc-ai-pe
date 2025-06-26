@@ -33,6 +33,15 @@ export async function addGround(scene, camera) {
     groundRoot.rotation = new BABYLON.Vector3(0, 0, 0); // Pas de rotation nécessaire
     groundRoot.checkCollisions = true; // Activer les collisions pour le sol
 
+    // Sol invisible collisionneur sous le sol GLB
+    const collisionGround = BABYLON.MeshBuilder.CreateBox("collisionGround", {
+      width: 100,
+      height: 2, // épaisseur
+      depth: 100
+    }, scene);
+    collisionGround.position = new BABYLON.Vector3(0, -1, 0); // sous le sol GLB
+    collisionGround.isVisible = false;
+    collisionGround.checkCollisions = true;
 
   } catch (err) {
     console.error("Erreur lors du chargement ou du clonage de la main :", err);

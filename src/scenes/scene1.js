@@ -6,45 +6,37 @@ import { addWall } from "../objects/addwall.js";
 import { addGround } from "../objects/addground.js";
 import { createScene2 } from "./scene2.js";
 
-export function createScene1(engine, canvas) {
+export async function createScene1(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
   scene.collisionsEnabled = true;
-
+  scene.gravity = new BABYLON.Vector3(0, -0.1, 0); // gravité plus douce
+  engine.getRenderingCanvas().tabIndex = 1; // pour éviter certains bugs clavier
 
   // Camera FPS
   const camera = new BABYLON.UniversalCamera("FPSCam", new BABYLON.Vector3(0, 2, -5), scene);
-  camera.attachControl(canvas, true);
-  // let inputMap = {};
-  // scene.actionManager = new BABYLON.ActionManager(scene);
-  // scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-  //   BABYLON.ActionManager.OnKeyDownTrigger,
-  //   evt => inputMap[evt.sourceEvent.key.toLowerCase()] = true
-  // ));
-
-  // scene.actionManager.registerAction(new BABYLON.ExecuteCodeAction(
-  //   BABYLON.ActionManager.OnKeyUpTrigger,
-  //   evt => inputMap[evt.sourceEvent.key.toLowerCase()] = false
-  // ));
+  camera.attachControl(canvas, true);  
 
   camera.speed = 0.5;
   camera.inertia = 0.7;
 
   // Activer les collisions de la caméra
   camera.checkCollisions = true;
-  //camera.applyGravity = true;
+  camera.applyGravity = true;
   camera.ellipsoid = new BABYLON.Vector3(1, 1, 1); // Ellipsoïde pour les collisions de la caméra
 
-  // Ajout des mains (appel à la fonction importée)
-  addHand(scene, camera);
+  camera.onCollide = function(collidedMesh) {
+    if (camera.position.y < 1.1) {
+      camera.position.y = 1.1; // force la caméra à rester au-dessus du sol
+    }
+  };
+
+  // Attendre le chargement des objets
+  await addGround(scene, camera);
+  await addWall(scene);
+  await addHand(scene, camera);
 
   // Lumière
   const light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 1, 0), scene);
-
-  // Sol
-  addGround(scene, camera);
-
-  // Murs (4 murs autour)
-  addWall(scene);
 
   // Cube interactif au centre
   const cube = BABYLON.MeshBuilder.CreateBox("cube", { size: 1 }, scene);
@@ -54,7 +46,7 @@ export function createScene1(engine, canvas) {
   cube.material = cubeMat;
 
   // Activer les collisions du cube
-  //cube.checkCollisions = true;
+  cube.checkCollisions = true;
   cube.actionManager = new BABYLON.ActionManager(scene);
   cube.actionManager.registerAction(
     new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
@@ -66,9 +58,6 @@ export function createScene1(engine, canvas) {
       });
     })
   );
-
- 
-
 
   return scene;  
 }
