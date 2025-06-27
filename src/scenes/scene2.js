@@ -2,6 +2,7 @@ import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { addHand } from '../objects/addhand.js';
 import { createScene3 } from './scene3.js';
+import { switchScene } from '../main.js';
 
 export function createScene2(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
@@ -12,7 +13,7 @@ export function createScene2(engine, canvas) {
   light.intensity = 0.7;
 
   // Ajout des mains (appel à la fonction importée)
-  addHand(scene, camera2);
+  addHand(scene, camera2);  
 
   BABYLON.SceneLoader.Append(
     "/models/",
@@ -40,12 +41,7 @@ export function createScene2(engine, canvas) {
     cube2.actionManager = new BABYLON.ActionManager(scene);
     cube2.actionManager.registerAction(
       new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
-        const newScene = createScene3(engine, canvas);
-        engine.runRenderLoop(() => {
-          if (newScene.activeCamera) {
-            newScene.render();
-          }
-        });
+        switchScene(createScene3);
       })
     );
   

@@ -3,6 +3,7 @@ import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import { addHand } from "../objects/addhand.js";
 import { createScene2 } from "./scene2.js";
+import { switchScene } from "../main.js";
 
 export async function createScene1(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
@@ -28,11 +29,6 @@ export async function createScene1(engine, canvas) {
     }
   };
 
-  let isJumping = false;
-  let jumpVelocity = 0;
-  const jumpPower = 0.25; // hauteur du saut
-  const gravity = -0.01;  // gravité personnalisée
-
   await addHand(scene, camera);
 
   // Lumière
@@ -55,12 +51,7 @@ export async function createScene1(engine, canvas) {
       mesh.actionManager = new BABYLON.ActionManager(scene);
       mesh.actionManager.registerAction(
         new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
-          const newScene = createScene2(engine, canvas);
-          engine.runRenderLoop(() => {
-            if (newScene.activeCamera) {
-              newScene.render();
-            }
-          });
+          switchScene(createScene2);
         })
       );
     }
@@ -134,26 +125,6 @@ export async function createScene1(engine, canvas) {
   wallWest.isVisible = false;
   wallWest.checkCollisions = true;
 
-  window.addEventListener("keydown", (event) => {
-    if (event.code === "Space" && !isJumping) {
-      isJumping = true;
-      jumpVelocity = jumpPower;
-    }
-  });
-
-  scene.onBeforeRenderObservable.add(() => {
-    if (isJumping) {
-      camera.position.y += jumpVelocity;
-      jumpVelocity += gravity;
-
-      // Collision avec le sol (y = 2 si le sol est à y=0 et l'ellipsoïde fait 1 de rayon)
-      if (camera.position.y <= 2) {
-        camera.position.y = 2;
-        isJumping = false;
-        jumpVelocity = 0;
-      }
-    }
-  });
 
   return scene;  
 }
