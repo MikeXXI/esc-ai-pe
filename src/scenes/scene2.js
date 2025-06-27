@@ -16,10 +16,10 @@ export function createScene2(engine, canvas) {
 
   BABYLON.SceneLoader.Append(
     "/models/",
-    "scene_parking.glb",
+    "env_egypt_map.glb",
     scene,
     function () {
-      console.log("Scene parking chargée !");
+      console.log("Scene égyptienne chargée !");
     },
     null,
     function (scene, message, exception) {

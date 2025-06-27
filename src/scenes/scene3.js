@@ -15,10 +15,10 @@ export function createScene3(engine, canvas) {
 
   BABYLON.SceneLoader.Append(
     "/models/",
-    "scene_cyberpunk.glb",
+    "Egyptian_map.glb",
     scene,
     function () {
-      console.log("Scene cyberpunk chargée !");
+      console.log("Scene égyptienne chargée !");
     },
     null,
     function (scene, message, exception) {

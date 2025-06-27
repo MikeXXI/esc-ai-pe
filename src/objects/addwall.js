@@ -7,7 +7,7 @@ export async function addWall(scene) {
     const { meshes } = await BABYLON.SceneLoader.ImportMeshAsync(
       "",
       "/models/",
-      "wall.glb",
+      "wall2.glb",
       scene
     );
 
@@ -17,8 +17,8 @@ export async function addWall(scene) {
     // Avant
     const frontWall = wall.clone("frontWall");
     frontWall.position = new BABYLON.Vector3(0, 0, 9.5);
-    frontWall.rotation = new BABYLON.Vector3(0, 0, 0);
-    frontWall.scaling = new BABYLON.Vector3(3.1, 2, 1);
+    frontWall.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
+    frontWall.scaling = new BABYLON.Vector3(2, 20, 20);
     frontWall.checkCollisions = true; // Activer les collisions pour le mur avant
     // Collisionneur invisible
     const frontWallCollider = BABYLON.MeshBuilder.CreateBox("frontWallCollider", {
@@ -31,8 +31,8 @@ export async function addWall(scene) {
     // Arrière
     const backWall = wall.clone("backWall");
     backWall.position = new BABYLON.Vector3(0, 0, -9.5);
-    backWall.rotation = new BABYLON.Vector3(0, Math.PI, 0);
-    backWall.scaling = new BABYLON.Vector3(3.1, 2, 1);
+    backWall.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
+    backWall.scaling = new BABYLON.Vector3(2, 20, 20);
     backWall.checkCollisions = true; // Activer les collisions pour le mur arrière
     // Collisionneur invisible
     const backWallCollider = BABYLON.MeshBuilder.CreateBox("backWallCollider", {
@@ -45,8 +45,8 @@ export async function addWall(scene) {
     // Gauche
     const leftWall = wall.clone("leftWall");
     leftWall.position = new BABYLON.Vector3(-9.5, 0, 0);
-    leftWall.rotation = new BABYLON.Vector3(0, -Math.PI / 2, 0);
-    leftWall.scaling = new BABYLON.Vector3(3.1, 2, 1);
+    leftWall.rotation = new BABYLON.Vector3(0, 0, 0);
+    leftWall.scaling = new BABYLON.Vector3(2, 20, 20);
     leftWall.checkCollisions = true; // Activer les collisions pour le mur gauche
     // Collisionneur invisible
     const leftWallCollider = BABYLON.MeshBuilder.CreateBox("leftWallCollider", {
@@ -59,8 +59,8 @@ export async function addWall(scene) {
     // Droite
     const rightWall = wall.clone("rightWall");
     rightWall.position = new BABYLON.Vector3(9.5, 0, 0);
-    rightWall.rotation = new BABYLON.Vector3(0, Math.PI / 2, 0);
-    rightWall.scaling = new BABYLON.Vector3(3.1, 2, 1);
+    rightWall.rotation = new BABYLON.Vector3(0, Math.PI, 0);
+    rightWall.scaling = new BABYLON.Vector3(2, 20, 20);
     rightWall.checkCollisions = true; // Activer les collisions pour le mur droit
     // Collisionneur invisible
     const rightWallCollider = BABYLON.MeshBuilder.CreateBox("rightWallCollider", {
