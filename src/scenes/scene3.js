@@ -98,5 +98,27 @@ export async function createScene3(engine, canvas) {
   // Optimisation : activer le culling sur tous les meshes
   meshes.forEach(mesh => mesh.alwaysSelectAsActiveMesh = false);
 
+  // --- Contrôle de montée de la caméra avec la touche espace ---
+  let isRising = false;
+  const maxY = 10; // Hauteur maximale de la caméra
+  const riseSpeed = 0.5; // Vitesse de montée
+
+  window.addEventListener('keydown', function (e) {
+    if (e.code === 'Space' && !isRising && camera.position.y < maxY) {
+      isRising = true;
+      scene.onBeforeRenderObservable.add(riseCamera);
+    }
+  });
+
+  function riseCamera() {
+    if (camera.position.y < maxY) {
+      camera.position.y += riseSpeed;
+      if (camera.position.y > maxY) camera.position.y = maxY;
+    } else {
+      scene.onBeforeRenderObservable.removeCallback(riseCamera);
+      isRising = false;
+    }
+  }
+
   return scene;
 }
