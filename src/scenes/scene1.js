@@ -69,6 +69,45 @@ export async function createScene1(engine, canvas) {
   meshes.forEach(mesh => mesh.checkCollisions = true);
   meshes.position = new BABYLON.Vector3(0, 0, 0);
 
+  // Ajout des statuettes d'enigma_1
+  const enigmaStatuettes = [
+    "statuette_pharaon.glb",
+    "statuette_horus.glb",
+    "statuette_hippo.glb",
+    "statuette_falcon.glb",
+    "statuette_dagger.glb",
+    "statuette_cross.glb"
+  ];
+  
+  // Positions pour chaque statuette (x, y, z)
+  const statuettePositions = [
+    new BABYLON.Vector3(-10, 22, 0),  // statuette_pharaon
+    new BABYLON.Vector3(-6, 22, 0),   // statuette_horus
+    new BABYLON.Vector3(-2, 22, 0),   // statuette_hippo
+    new BABYLON.Vector3(2, 22, 0),    // statuette_falcon
+    new BABYLON.Vector3(6, 22, 0),    // statuette_dagger
+    new BABYLON.Vector3(10, 22, 0)    // statuette_cross
+  ];
+  
+  for (let i = 0; i < enigmaStatuettes.length; i++) {
+    const file = enigmaStatuettes[i];
+    try {
+      const result = await BABYLON.SceneLoader.ImportMeshAsync(
+        "", // importer tous les meshes
+        "/models/enigma_1/", // dossier
+        file,
+        scene
+      );
+      // Positionner chaque statuette selon le tableau de positions
+      result.meshes.forEach(mesh => {
+        mesh.position = statuettePositions[i];
+        mesh.checkCollisions = true;
+      });
+    } catch (e) {
+      console.error("Erreur chargement statuette:", file, e);
+    }
+  }
+
   // Crée un sol invisible juste sous la caméra, à la hauteur du dessus de la carte
   const invisibleGround = BABYLON.MeshBuilder.CreateBox("invisibleGround", {
     width: 28, // adapte à la taille de ta carte
