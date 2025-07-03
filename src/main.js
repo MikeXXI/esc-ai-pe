@@ -2,6 +2,8 @@ import * as BABYLON from "babylonjs";
 import { createScene1 } from "./scenes/scene1.js";
 import { createScene2 } from "./scenes/scene2.js";
 import { createScene3 } from "./scenes/scene3.js";
+import { createScene4 } from "./scenes/scene4.js";
+import { createScene5 } from "./scenes/scene5.js";
 
 const canvas = document.getElementById("renderCanvas");
 const engine = new BABYLON.Engine(canvas, true);

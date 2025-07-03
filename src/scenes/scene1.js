@@ -4,6 +4,7 @@ import "babylonjs-loaders";
 import { addHand } from "../objects/addhand.js";
 import { createScene2 } from "./scene2.js";
 import { switchScene } from "../main.js";
+import { addSphinxInterface } from "../objects/addSphinx.js"; 
 
 export async function createScene1(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
@@ -34,29 +35,17 @@ export async function createScene1(engine, canvas) {
   // Lumière
   const light = new BABYLON.HemisphericLight("light1", new BABYLON.Vector3(0, 22, 0), scene);
 
-  // Portail interactif (remplace le cube)
+  // Portail interactif (remplace le cube) — on le cache au début
   const portalImport = await BABYLON.SceneLoader.ImportMeshAsync(
-    "",            // importer tous les meshess
-    "/models/",    // dossier
-    "egyptian_statue.glb", // nom du fichier
-    scene
+    "", "/models/", "egyptian_statue.glb", scene
   );
   const portalMeshes = portalImport.meshes;
-  // Positionner le portail à la même position que le cube d'origine
   portalMeshes.forEach(mesh => {
     mesh.position = new BABYLON.Vector3(0, 10, -5);
     mesh.checkCollisions = true;
-    mesh.isVisible = true;
-    if (mesh.name !== "__root__") {
-      mesh.actionManager = new BABYLON.ActionManager(scene);
-      mesh.actionManager.registerAction(
-        new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
-          switchScene(createScene2);
-        })
-      );
-    }
+    mesh.isVisible = false; // caché au début
   });
- 
+
   camera.setTarget(new BABYLON.Vector3(5, 22, 0));
 
   const { meshes } = await BABYLON.SceneLoader.ImportMeshAsync(
@@ -69,44 +58,64 @@ export async function createScene1(engine, canvas) {
   meshes.forEach(mesh => mesh.checkCollisions = true);
   meshes.position = new BABYLON.Vector3(0, 0, 0);
 
-  // Ajout des statuettes d'enigma_1
+  // Liste des statuettes à enchaîner
   const enigmaStatuettes = [
-    "statuette_pharaon.glb",
-    "statuette_horus.glb",
     "statuette_hippo.glb",
     "statuette_falcon.glb",
     "statuette_dagger.glb",
     "statuette_cross.glb"
   ];
-  
-  // Positions pour chaque statuette (x, y, z)
   const statuettePositions = [
-    new BABYLON.Vector3(-10, 22, 0),  // statuette_pharaon
-    new BABYLON.Vector3(-6, 22, 0),   // statuette_horus
-    new BABYLON.Vector3(-2, 22, 0),   // statuette_hippo
-    new BABYLON.Vector3(2, 22, 0),    // statuette_falcon
-    new BABYLON.Vector3(6, 22, 0),    // statuette_dagger
-    new BABYLON.Vector3(10, 22, 0)    // statuette_cross
+    new BABYLON.Vector3(-2, 25, 0),
+    new BABYLON.Vector3(2, 22, 0),
+    new BABYLON.Vector3(6, 22, 0),
+    new BABYLON.Vector3(10, 22, 0)
   ];
-  
+
+  let statuetteMeshes = [];
+
   for (let i = 0; i < enigmaStatuettes.length; i++) {
     const file = enigmaStatuettes[i];
     try {
       const result = await BABYLON.SceneLoader.ImportMeshAsync(
-        "", // importer tous les meshes
-        "/models/enigma_1/", // dossier
-        file,
-        scene
+        "", "/models/enigma_1/", file, scene
       );
-      // Positionner chaque statuette selon le tableau de positions
       result.meshes.forEach(mesh => {
         mesh.position = statuettePositions[i];
         mesh.checkCollisions = true;
+        mesh.isVisible = (i === 0); // Seule la première est visible au début
+        mesh.actionManager = new BABYLON.ActionManager(scene);
+        mesh.actionManager.registerAction(
+          new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+            mesh.isVisible = false; // Cache la statuette actuelle
+            if (i + 1 < enigmaStatuettes.length) {
+              // Affiche la suivante
+              statuetteMeshes[i + 1].forEach(m => m.isVisible = true);
+            } else {
+              // Si c'était la dernière, affiche le portail
+              portalMeshes.forEach(pm => pm.isVisible = true);
+            }
+          })
+        );
       });
+      statuetteMeshes.push(result.meshes);
     } catch (e) {
       console.error("Erreur chargement statuette:", file, e);
+      statuetteMeshes.push([]); // pour garder l'index aligné
     }
   }
+
+  // Rendre le portail interactif (après la boucle)
+  portalMeshes.forEach(mesh => {
+    if (mesh.name !== "__root__") {
+      mesh.actionManager = new BABYLON.ActionManager(scene);
+      mesh.actionManager.registerAction(
+        new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+          switchScene(createScene2);
+        })
+      );
+    }
+  });
 
   // Crée un sol invisible juste sous la caméra, à la hauteur du dessus de la carte
   const invisibleGround = BABYLON.MeshBuilder.CreateBox("invisibleGround", {
@@ -164,6 +173,7 @@ export async function createScene1(engine, canvas) {
   wallWest.isVisible = false;
   wallWest.checkCollisions = true;
 
+  addSphinxInterface(scene);
 
   return scene;  
 }

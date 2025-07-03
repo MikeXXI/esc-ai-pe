@@ -3,6 +3,7 @@ import 'babylonjs-loaders';
 import { addHand } from '../objects/addhand.js';
 import { createScene3 } from './scene3.js';
 import { switchScene } from '../main.js';
+import { addSphinxInterface } from '../objects/addSphinx.js';
 
 export async function createScene2(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
@@ -14,7 +15,6 @@ export async function createScene2(engine, canvas) {
 
   // Ajout des mains (appel à la fonction importée)
   addHand(scene, camera2);  
-
 
   const cubeImport = await BABYLON.SceneLoader.ImportMeshAsync(
     "",            // importer tous les meshess
@@ -35,7 +35,6 @@ export async function createScene2(engine, canvas) {
         })
       );
     }
-
   });
 
   const cube2 = BABYLON.MeshBuilder.CreateBox("cube2", { size: 1.5 }, scene);
@@ -47,6 +46,8 @@ export async function createScene2(engine, canvas) {
   // Centrer la caméra sur le cube
   camera2.setTarget(new BABYLON.Vector3(2.5, 2, 0));
 
+  // Ajouter l'interface Sphinx
+  addSphinxInterface(scene);
 
   return scene;
 }

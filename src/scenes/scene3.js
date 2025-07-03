@@ -1,6 +1,7 @@
 import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { addHand } from '../objects/addhand.js';
+import { addSphinxInterface } from "../objects/addSphinx.js"; 
 
 export async function createScene3(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
@@ -119,6 +120,8 @@ export async function createScene3(engine, canvas) {
       isRising = false;
     }
   }
+
+  addSphinxInterface(scene);
 
   return scene;
 }
