@@ -37,7 +37,7 @@ export async function createScene1(engine, canvas) {
 
   // Portail interactif (remplace le cube) — on le cache au début
   const portalImport = await BABYLON.SceneLoader.ImportMeshAsync(
-    "", "/models/", "egyptian_statue.glb", scene
+    "", "/models/enigma_1/", "statuette_isis.glb", scene
   );
   const portalMeshes = portalImport.meshes;
   portalMeshes.forEach(mesh => {
@@ -62,17 +62,28 @@ export async function createScene1(engine, canvas) {
   const enigmaStatuettes = [
     "statuette_hippo.glb",
     "statuette_falcon.glb",
-    "statuette_dagger.glb",
-    "statuette_cross.glb"
+    "statuette_axe.glb",
+    "statuette_cross.glb",
+    "statuette_isis.glb"
   ];
   const statuettePositions = [
-    new BABYLON.Vector3(-2, 25, 0),
-    new BABYLON.Vector3(2, 22, 0),
-    new BABYLON.Vector3(6, 22, 0),
-    new BABYLON.Vector3(10, 22, 0)
+    new BABYLON.Vector3(0, 15, 8),   // statuette_hippo
+    new BABYLON.Vector3(1, 21.6, -3.5),    // statuette_falcon
+    new BABYLON.Vector3(-1, 18.9, 2),    // statuette_axe
+    new BABYLON.Vector3(-6.5, 21, 2),    // statuette_cross
+    new BABYLON.Vector3(0, 10, -5)       // statuette_isis (exemple position, à ajuster)
   ];
 
   let statuetteMeshes = [];
+  let clickSequence = [];
+  const correctOrder = [
+    "statuette_hippo.glb",
+    "statuette_falcon.glb",
+    "statuette_axe.glb",
+    "statuette_cross.glb",
+    "statuette_isis.glb"
+  ];
+  let successCube = null;
 
   for (let i = 0; i < enigmaStatuettes.length; i++) {
     const file = enigmaStatuettes[i];
@@ -83,17 +94,37 @@ export async function createScene1(engine, canvas) {
       result.meshes.forEach(mesh => {
         mesh.position = statuettePositions[i];
         mesh.checkCollisions = true;
-        mesh.isVisible = (i === 0); // Seule la première est visible au début
+        mesh.isVisible = true; // Toutes visibles dès le début
+        // Réduction de la taille pour la statuette_axe
+        if (file === "statuette_axe.glb") {
+          mesh.scaling = new BABYLON.Vector3(0.06, 0.06, 0.06);
+          mesh.rotation = new BABYLON.Vector3(0, Math.PI / 0.6, 0);
+        }
+        // Ajout d'une rotation pour la statuette_hippo
+        if (file === "statuette_hippo.glb") {
+          mesh.rotation = new BABYLON.Vector3(0, Math.PI / 0.8, 1);
+        }
+        // // Ajout d'une rotation pour la statuette_hippo
+        // if (file === "statuette_isis.glb") {
+        //   mesh.rotation = new BABYLON.Vector3(0, Math.PI / 0.2, 1);
+        // }
         mesh.actionManager = new BABYLON.ActionManager(scene);
         mesh.actionManager.registerAction(
           new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
-            mesh.isVisible = false; // Cache la statuette actuelle
-            if (i + 1 < enigmaStatuettes.length) {
-              // Affiche la suivante
-              statuetteMeshes[i + 1].forEach(m => m.isVisible = true);
-            } else {
-              // Si c'était la dernière, affiche le portail
-              portalMeshes.forEach(pm => pm.isVisible = true);
+            // Ajoute le nom du fichier à la séquence de clics
+            clickSequence.push(file);
+            // Vérifie la séquence
+            for (let j = 0; j < clickSequence.length; j++) {
+              if (clickSequence[j] !== correctOrder[j]) {
+                clickSequence = [];
+                // Optionnel : feedback visuel/sonore d'erreur
+                return;
+              }
+            }
+            // Si la séquence est complète et correcte
+            if (clickSequence.length === correctOrder.length) {
+              // Passe à la scène suivante
+              switchScene(createScene2);
             }
           })
         );
