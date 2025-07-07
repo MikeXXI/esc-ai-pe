@@ -115,9 +115,29 @@ export function addSphinxInterface(scene) {
       chatMessages.innerHTML += `<div style="margin: 5px 0; padding: 5px; background: rgba(0,255,0,0.2); border-radius: 3px;">Vous: ${message}</div>`;
       chatInput.value = '';
       chatMessages.scrollTop = chatMessages.scrollHeight;
-      
-      // Ici tu peux ajouter la logique pour traiter le message
-      console.log('Message envoyé:', message);
+
+      const formattedMessage = JSON.stringify({ question: message, room: "A1" });
+      console.log('Message formaté:', formattedMessage);
+
+        fetch('http://127.0.0.1:5000/api/ask', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: formattedMessage
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.response) { // <-- ici
+                chatMessages.innerHTML += `<div style="margin: 5px 0; padding: 5px; background: rgba(0,0,255,0.2); border-radius: 3px;">Sphinx: ${data.response}</div>`;
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        })
+        .catch(error => {
+            chatMessages.innerHTML += `<div style="margin: 5px 0; padding: 5px; background: rgba(255,0,0,0.2); border-radius: 3px;">Erreur serveur</div>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            console.error('Erreur lors de l\'envoi au serveur:', error);
+        });
     }
   });
 
