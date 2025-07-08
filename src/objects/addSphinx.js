@@ -96,8 +96,11 @@ export function addSphinxInterface(scene) {
   // Gestion des événements
   let isChatOpen = false;
   let hasWelcomed = false;
-
+  
+    // Récupère le nom de la scène pour l'envoyer à l'IA
   let room = scene.name;
+
+  let foundObj = scene.cli
 
   sphinxImage.addEventListener('click', () => {
     if (!isChatOpen) {
@@ -144,7 +147,7 @@ export function addSphinxInterface(scene) {
       chatInput.value = '';
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      const formattedMessage = JSON.stringify({ question: message, room: room });
+      const formattedMessage = JSON.stringify({ question: "(Fais un message simple, sans markdown et donne des indices plutôt que les solutions. Ne répète pas le message de bienvenue.) " + message, room: room });
       console.log('Message formaté:', formattedMessage);
 
         fetch('http://127.0.0.1:5000/api/ask', {
