@@ -10,6 +10,7 @@ export async function createScene1(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
   scene.collisionsEnabled = true;
   scene.gravity = new BABYLON.Vector3(0, -0.1, 0); // gravité douce
+  scene.name = "A1";
   engine.getRenderingCanvas().tabIndex = 1; // pour éviter certains bugs clavier
 
   // Camera FPS

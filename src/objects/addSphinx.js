@@ -97,6 +97,8 @@ export function addSphinxInterface(scene) {
   let isChatOpen = false;
   let hasWelcomed = false;
 
+  let room = scene.name;
+
   sphinxImage.addEventListener('click', () => {
     if (!isChatOpen) {
       chatBox.style.display = 'block';
@@ -106,7 +108,7 @@ export function addSphinxInterface(scene) {
       // Envoi du message de bienvenue seulement à la première ouverture
       if (!hasWelcomed) {
         hasWelcomed = true;
-        const formattedMessage = JSON.stringify({ question: "Oublie toutes les précédentes conversations et fais un message de bienvenue.", room: "A1" });
+        const formattedMessage = JSON.stringify({ question: "Oublie toutes les précédentes conversations et fais un message de bienvenue.", room: room });
         fetch('http://127.0.0.1:5000/api/ask', {
           method: 'POST',
           headers: {
@@ -142,7 +144,7 @@ export function addSphinxInterface(scene) {
       chatInput.value = '';
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      const formattedMessage = JSON.stringify({ question: message, room: "A1" });
+      const formattedMessage = JSON.stringify({ question: message, room: room });
       console.log('Message formaté:', formattedMessage);
 
         fetch('http://127.0.0.1:5000/api/ask', {
