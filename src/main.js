@@ -19,7 +19,7 @@ async function switchScene(createSceneFunc) {
 }
 
 // Lancer la première scène
-switchScene(createScene1);
+switchScene(createScene3);
 
 // RenderLoop dynamique
 engine.runRenderLoop(() => {

@@ -2,6 +2,8 @@ import * as BABYLON from 'babylonjs';
 import 'babylonjs-loaders';
 import { addHand } from '../objects/addhand.js';
 import { addSphinxInterface } from "../objects/addSphinx.js"; 
+import { createScene4 } from "./scene4.js";
+import { switchScene } from "../main.js";
 
 export async function createScene3(engine, canvas) {
   const scene = new BABYLON.Scene(engine);
@@ -38,6 +40,41 @@ export async function createScene3(engine, canvas) {
   meshes.forEach(mesh => {
     mesh.checkCollisions = true;
     mesh.freezeWorldMatrix(); // Optimisation : fige la matrice si statique
+  });
+
+  // Chargement de la porte égyptienne
+  const doorImport = await BABYLON.SceneLoader.ImportMeshAsync(
+    "",
+    "/models/",
+    "Egyptian_map_door.glb",
+    scene
+  );
+  doorImport.meshes.forEach(mesh => {
+    mesh.position = new BABYLON.Vector3(-3.70, 0, 0); // Position à ajuster selon tes besoins
+    mesh.rotation = new BABYLON.Vector3(0, 0, 0); // Rotation de 90° autour de Y
+    mesh.checkCollisions = true;
+  });
+  let doorMeshes = doorImport.meshes;
+
+  // Chargement du nez du sphinx
+  const noseImport = await BABYLON.SceneLoader.ImportMeshAsync(
+    "",
+    "/models/enigma_2/",
+    "sphinx_nose_scale.glb",
+    scene
+  );
+  noseImport.meshes.forEach(mesh => {
+    mesh.position = new BABYLON.Vector3(-10, 13.70, -6.30); // Position à ajuster selon tes besoins
+    mesh.rotation = new BABYLON.Vector3(1.70, 6.87, -4.10); // Rotation de 90° autour de Y
+    mesh.checkCollisions = true;
+    
+    // Rendre le nez cliquable
+    mesh.actionManager = new BABYLON.ActionManager(scene);
+    mesh.actionManager.registerAction(
+      new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
+        switchScene(createScene4);
+      })
+    );
   });
 
   // Crée un sol invisible pour collisions
@@ -104,7 +141,14 @@ export async function createScene3(engine, canvas) {
   const maxY = 10; // Hauteur maximale de la caméra
   const riseSpeed = 0.5; // Vitesse de montée
 
+  // Contrôles pour déplacer la porte
+  let doorPosition = new BABYLON.Vector3(-3.70, 0, 0);
+  let doorRotation = new BABYLON.Vector3(0, 0, 0);
+  const moveSpeed = 0.1;
+  const rotationSpeed = 0.1;
+
   window.addEventListener('keydown', function (e) {
+    // Contrôles existants pour la caméra
     if (e.code === 'Space' && !isRising && camera.position.y < maxY) {
       isRising = true;
       scene.onBeforeRenderObservable.add(riseCamera);
@@ -121,7 +165,32 @@ export async function createScene3(engine, canvas) {
     }
   }
 
-  addSphinxInterface(scene);
+  // Animation de la porte
+  function animateDoor() {
+    const targetX = -3.70 + 1; // déplacement latéral de 5 unités
+    const anim = new BABYLON.Animation(
+      "doorMove",
+      "position.x",
+      60,
+      BABYLON.Animation.ANIMATIONTYPE_FLOAT,
+      BABYLON.Animation.ANIMATIONLOOPMODE_CONSTANT
+    );
+    anim.setKeys([
+      { frame: 0, value: doorMeshes[0].position.x },
+      { frame: 60, value: targetX }
+    ]);
+    doorMeshes.forEach(mesh => {
+      mesh.animations = [anim];
+      scene.beginAnimation(mesh, 0, 60, false);
+    });
+  }
+
+  // Ajout de l'interface Sphinx avec callback
+  addSphinxInterface(scene, (message) => {
+    if (message.trim().toLowerCase() === "vert") {
+      animateDoor();
+    }
+  });
 
   return scene;
 }

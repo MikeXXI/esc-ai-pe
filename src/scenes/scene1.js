@@ -2,7 +2,7 @@
 import * as BABYLON from "babylonjs";
 import "babylonjs-loaders";
 import { addHand } from "../objects/addhand.js";
-import { createScene2 } from "./scene2.js";
+import { createScene3 } from "./scene3.js";
 import { switchScene } from "../main.js";
 import { addSphinxInterface } from "../objects/addSphinx.js"; 
 
@@ -125,7 +125,7 @@ export async function createScene1(engine, canvas) {
             // Si la séquence est complète et correcte
             if (clickSequence.length === correctOrder.length) {
               // Passe à la scène suivante
-              switchScene(createScene2);
+              switchScene(createScene3);
             }
           })
         );
@@ -143,7 +143,7 @@ export async function createScene1(engine, canvas) {
       mesh.actionManager = new BABYLON.ActionManager(scene);
       mesh.actionManager.registerAction(
         new BABYLON.ExecuteCodeAction(BABYLON.ActionManager.OnPickTrigger, function () {
-          switchScene(createScene2);
+          switchScene(createScene3);
         })
       );
     }

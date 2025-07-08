@@ -5,7 +5,7 @@ import * as BABYLON from "babylonjs";
  * @param {BABYLON.Scene} scene - La scène BabylonJS
  * @returns {Object} - Objet contenant les références aux éléments DOM pour nettoyage
  */
-export function addSphinxInterface(scene) {
+export function addSphinxInterface(scene, onUserMessage) {
   // --- Interface Sphinx en haut à droite ---
   const sphinxContainer = document.createElement('div');
   sphinxContainer.style.cssText = `
@@ -146,6 +146,11 @@ export function addSphinxInterface(scene) {
       chatMessages.innerHTML += `<div style="margin: 5px 0; padding: 5px; background: rgba(0,255,0,0.2); border-radius: 3px;">Vous: ${message}</div>`;
       chatInput.value = '';
       chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // Appeler le callback si fourni
+      if (typeof onUserMessage === 'function') {
+        onUserMessage(message);
+      }
 
       const formattedMessage = JSON.stringify({ question: "(Fais un message simple, sans markdown et donne des indices plutôt que les solutions. Ne répète pas le message de bienvenue.) " + message, room: room });
       console.log('Message formaté:', formattedMessage);
