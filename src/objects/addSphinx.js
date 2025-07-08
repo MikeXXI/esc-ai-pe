@@ -95,12 +95,38 @@ export function addSphinxInterface(scene) {
 
   // Gestion des événements
   let isChatOpen = false;
+  let hasWelcomed = false;
 
   sphinxImage.addEventListener('click', () => {
     if (!isChatOpen) {
       chatBox.style.display = 'block';
       chatInput.focus();
       isChatOpen = true;
+
+      // Envoi du message de bienvenue seulement à la première ouverture
+      if (!hasWelcomed) {
+        hasWelcomed = true;
+        const formattedMessage = JSON.stringify({ question: "Oublie toutes les précédentes conversations et fais un message de bienvenue.", room: "A1" });
+        fetch('http://127.0.0.1:5000/api/ask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: formattedMessage
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data && data.response) {
+            chatMessages.innerHTML += `<div style="margin: 5px 0; padding: 5px; background: rgba(0,0,255,0.2); border-radius: 3px;">Sphinx: ${data.response}</div>`;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+          }
+        })
+        .catch(error => {
+          chatMessages.innerHTML += `<div style="margin: 5px 0; padding: 5px; background: rgba(255,0,0,0.2); border-radius: 3px;">Erreur serveur</div>`;
+          chatMessages.scrollTop = chatMessages.scrollHeight;
+          console.error('Erreur lors de l\'envoi au serveur:', error);
+        });
+      }
     }
   });
 
